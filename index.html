@@ -131,12 +131,17 @@
     </div>
   </section>
 
-  <section class="container" id="map">
-    <h2 class="section-title">Interactive Map</h2>
-    <div class="text-center">
-      <a href="https://www.google.com/maps/search/monasteries+in+sikkim/" class="btn" target="_blank">Open Map</a>
+<section class="container" id="map">
+  <h2 class="section-title">Interactive Monastery Map</h2>
+
+  <div id="map-and-directions-wrapper">
+    <div id="map-container"></div>
+    
+    <div id="directions-panel">
+      <p>Click on a monastery marker on the map to see the path and directions here.</p>
     </div>
-  </section>
+  </div>
+</section>
   <!-- <header>
     <video poster="https://www.tourmyindia.com/socialimg/sikkim-tourism.jpg" id="hero-video" autoplay loop muted playsinline>
       <source src="video/my.mp4" type="video/mp4">
@@ -158,6 +163,79 @@
 <footer>
   <p>May your journey be filled with peace. <span>•</span> Discovering Sikkim's Sacred Soul</p>
 </footer>
+
+
+
+<script>
+    function initMap() {
+      // 1. Initialize Directions Service & Renderer
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+
+      const centerOfSikkim = { lat: 27.3389, lng: 88.6065 };
+
+      // 2. Create the main map object
+      const map = new google.maps.Map(document.getElementById("map-container"), {
+        zoom: 9,
+        center: centerOfSikkim,
+      });
+
+      // 3. Link the Directions Renderer to the map and panel
+      directionsRenderer.setMap(map);
+      directionsRenderer.setPanel(document.getElementById("directions-panel"));
+
+      // 4. Create an array of monastery locations
+      const monasteries = [
+        { position: { lat: 27.2918, lng: 88.5663 }, title: "Rumtek Monastery" },
+        { position: { lat: 27.2942, lng: 88.2618 }, title: "Pemayangtse Monastery" },
+        { position: { lat: 27.2471, lng: 88.2912 }, title: "Tashiding Monastery" },
+        { position: { lat: 27.4697, lng: 88.5833 }, title: "Phodong Monastery" },
+        { position: { lat: 27.2289, lng: 88.3970 }, title: "Ralong Monastery" },
+        { position: { lat: 27.3392, lng: 88.6180 }, title: "Enchey Monastery" }
+      ];
+
+      // 5. Loop through and create clickable markers
+      monasteries.forEach(monasteryData => {
+        const marker = new google.maps.Marker({
+          position: monasteryData.position,
+          map: map,
+          title: monasteryData.title,
+        });
+
+        // Add a click listener to each marker
+        marker.addListener("click", () => {
+          calculateAndDisplayRoute(monasteryData.position);
+        });
+      });
+
+      // 6. Function to calculate and display the route
+      function calculateAndDisplayRoute(destination) {
+        // Use a default origin for now, like Gangtok.
+        // For a real app, you would get the user's location.
+        const origin = { lat: 27.3314, lng: 88.6138 }; // Gangtok
+
+        const request = {
+          origin: origin,
+          destination: destination,
+          travelMode: 'DRIVING'
+        };
+
+        directionsService.route(request, (result, status) => {
+          if (status == 'OK') {
+            directionsRenderer.setDirections(result);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
+    }
+  </script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAu4oAjyiQkx606RRxUL5_vtJvAbDxpruk&callback=initMap"></script>
+
+</body>
+</html>
+
 
 </body>
 </html>
